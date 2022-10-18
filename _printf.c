@@ -1,51 +1,51 @@
-#include "holberton.h"
+#include "main.h"
 
 /**
- * _printf - formatted output conversion and print data.
- * @format: input string.
+ * _printf - a function that produces output according to
+ * a format.
+ * @format: The format to be used in printing
+ * @...: Arguments list
  *
- * Return: number of chars printed.
+ * Return: (int) the number of characters printed
  */
 int _printf(const char *format, ...)
 {
-	unsigned int i = 0, len = 0, ibuf = 0;
-	va_list arguments;
-	int (*function)(va_list, char *, unsigned int);
-	char *buffer;
+	va_list args, args_copy;
+	int i = 0, j, count, spec_count = 0;
+	char c, next_c, *spec = NULL;
+	int (*op)(int, char *, va_list) = NULL;
 
-	va_start(arguments, format), buffer = malloc(sizeof(char) * 1024);
-	if (!format || !buffer || (format[i] == '%' && !format[i + 1]))
-		return (-1);
-	if (!format[i])
-		return (0);
-	for (i = 0; format && format[i]; i++)
+	va_start(args, format);
+	count = (format != NULL) ? 0 : -1;
+	while (format != NULL && format[i] != '\0')
 	{
-		if (format[i] == '%')
+		c = format[i];
+		next_c = format[i + 1];
+		if (c == '%' && _is_specifier(next_c) == 1)
 		{
-			if (format[i + 1] == '\0')
-			{	print_buf(buffer, ibuf), free(buffer), va_end(arguments);
-				return (-1);
+			spec = _realloc(NULL, 0, 2);
+			j = 0;
+			while (format[++i] != '\0' && op == NULL && spec != NULL)
+			{
+				spec[j++] = format[i];
+				spec[j] = '\0';
+				op = get_print_function(spec);
+				if (op != NULL)
+				{
+					va_copy(args_copy, args);
+					count += op(spec_count++, spec, args_copy);
+				}
+				spec = _realloc(spec, _strlen(spec), _strlen(spec) + 2);
 			}
-			else
-			{	function = get_print_func(format, i + 1);
-				if (function == NULL)
-				{
-					if (format[i + 1] == ' ' && !format[i + 2])
-						return (-1);
-					handl_buf(buffer, format[i], ibuf), len++, i--;
-				}
-				else
-				{
-					len += function(arguments, buffer, ibuf);
-					i += ev_print_func(format, i + 1);
-				}
-			} i++;
+			op = NULL;
+			free(spec);
+			continue;
 		}
-		else
-			handl_buf(buffer, format[i], ibuf), len++;
-		for (ibuf = len; ibuf > 1024; ibuf -= 1024)
-			;
+		i = (c == '%' && next_c == '%') ? i + 1 : i;
+		c = (c == '%' && next_c == '%') ? next_c : c;
+		count += _putchar(c);
+		++i;
 	}
-	print_buf(buffer, ibuf), free(buffer), va_end(arguments);
-	return (len);
+	va_end(args);
+	return (count);
 }
