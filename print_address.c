@@ -1,41 +1,24 @@
-#include "main.h"
-#define COMPUTE_REMAINDER(val) (val < 10 ? (48 + val) : (87 + val))
+#include "holberton.h"
 
 /**
- * print_address - prints the address
- * @n: The index of the arg in the list
- * @format: The format for this arg
- * @args: The argument list
- *
- * Return: (int) The number of characters printed
+ * print_address - prints address of input in hexa format
+ * @l: va_list arguments from _printf
+ * @f: pointer to the struct flags that determines
+ * if a flag is passed to _printf
+ * Return: number of char printed
  */
-int print_address(int n __attribute__((unused)),
-				  char *format __attribute__((unused)),
-				  va_list args)
+int print_address(va_list l, flags_t *f)
 {
-	int count = 0, i;
-	long unsigned int quotient, remainder, decimal_num;
-	char *str = NULL;
+	char *str;
+	unsigned long int p = va_arg(l, unsigned long int);
 
-	for (; n < 0; n--)
-		va_arg(args, void *);
-	decimal_num = va_arg(args, long unsigned int);
+	register int count = 0;
 
-	str = _realloc(str, 0, 2);
-	if (str != NULL)
-	{
-		for (quotient = decimal_num, i = 0;
-			 quotient > 0 && decimal_num > 0;
-			 quotient /= 16)
-		{
-			remainder = quotient % 16;
-			str[i++] = COMPUTE_REMAINDER(remainder);
-			str[i] = '\0';
-			str = _realloc(str, _strlen(str), _strlen(str) + 2);
-		}
-		count += _puts("0x");
-		count += _puts(_reverse_string(str));
-		free(str);
-	}
+	(void)f;
+	if (!p)
+		return (_puts("(nil)"));
+	str = convert(p, 16, 1);
+	count += _puts("0x");
+	count += _puts(str);
 	return (count);
 }
