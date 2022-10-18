@@ -1,2 +1,0 @@
-#!/bin/bash
-git checkout shukri && git pull origin main && git pull origin tindi && git push --set-upstream origin shukri
